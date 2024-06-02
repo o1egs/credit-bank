@@ -25,13 +25,13 @@ public class CalculatorController {
 
     @PostMapping("/offers")
     public ResponseEntity<List<LoanOfferDto>> offers(@RequestBody LoanStatementRequestDto loanStatementRequestDto) {
-        List<LoanOfferDto> offers = calculatorService.offers();
+        List<LoanOfferDto> offers = calculatorService.offers(loanStatementRequestDto);
         return ResponseEntity.ok(offers);
     }
 
     @PostMapping("/calc")
     public ResponseEntity<CreditDto> calc(@RequestBody ScoringDataDto scoringDataDto) {
-        CreditDto calc = calculatorService.calc();
+        CreditDto calc = calculatorService.calc(scoringDataDto);
         return ResponseEntity.ok(calc);
     }
 }
