@@ -1,9 +1,9 @@
-package ru.shtyrev.calculator_service.dtos;
+package ru.shtyrev.dtos.dtos;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.shtyrev.calculator_service.enums.EmploymentStatus;
-import ru.shtyrev.calculator_service.enums.Position;
+import ru.shtyrev.dtos.enums.*;
+
 
 import java.math.BigDecimal;
 

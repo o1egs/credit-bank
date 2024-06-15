@@ -1,4 +1,4 @@
-package ru.shtyrev.calculator_service.annotation;
+package ru.shtyrev.dtos.annotation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

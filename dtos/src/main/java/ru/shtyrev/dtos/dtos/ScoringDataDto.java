@@ -1,9 +1,9 @@
-package ru.shtyrev.calculator_service.dtos;
+package ru.shtyrev.dtos.dtos;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.shtyrev.calculator_service.enums.Gender;
-import ru.shtyrev.calculator_service.enums.MaritalStatus;
+import ru.shtyrev.dtos.enums.*;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
