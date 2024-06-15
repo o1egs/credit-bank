@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.shtyrev.deal_service.annotation.Adult;
-import ru.shtyrev.deal_service.enums.Gender;
-import ru.shtyrev.deal_service.enums.MaritalStatus;
+import ru.shtyrev.dtos.annotation.Adult;
+import ru.shtyrev.dtos.enums.Gender;
+import ru.shtyrev.dtos.enums.MaritalStatus;
 
 import java.time.LocalDate;
 import java.util.UUID;
