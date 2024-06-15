@@ -1,4 +1,4 @@
-package ru.shtyrev.calculator_service.dtos;
+package ru.shtyrev.dtos.dtos;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

@@ -1,6 +1,7 @@
 package ru.shtyrev.calculator_service.services.impl;
 
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import ru.shtyrev.calculator_service.dtos.*;
 import ru.shtyrev.calculator_service.services.CalculatorService;
+import ru.shtyrev.dtos.dtos.*;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -36,7 +38,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     final Validator validator;
 
     @Override
-    public List<LoanOfferDto> offers(LoanStatementRequestDto loanStatementRequestDto) {
+    public List<LoanOfferDto> offers(@Valid LoanStatementRequestDto loanStatementRequestDto) {
         logger.info("Received loan statement request: {}", loanStatementRequestDto);
 
         var constraintViolations = validator.validate(loanStatementRequestDto);
@@ -70,27 +72,28 @@ public class CalculatorServiceImpl implements CalculatorService {
         BigDecimal totalAmount;
 
         if (isInsuranceEnabled) {
-            BigDecimal insuranceAmount = requestAmount.divide(BigDecimal.TEN);
-            totalAmount = requestAmount.add(insuranceAmount);
-            rate = rate.subtract(new BigDecimal(3));
+            BigDecimal insuranceAmount = requestAmount.divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP);
+            totalAmount = requestAmount.add(insuranceAmount).setScale(4, RoundingMode.HALF_UP);
+            rate = rate.subtract(new BigDecimal(3)).setScale(4, RoundingMode.HALF_UP);
         } else {
-            totalAmount = requestAmount;
-            rate = rate.add(new BigDecimal(1));
+            totalAmount = requestAmount.setScale(4, RoundingMode.HALF_UP);
+            rate = rate.add(new BigDecimal(1)).setScale(4, RoundingMode.HALF_UP);
         }
 
         if (isSalaryClient) {
-            rate = rate.subtract(new BigDecimal(1));
+            rate = rate.subtract(new BigDecimal(1)).setScale(4, RoundingMode.HALF_UP);
         }
 
-        BigDecimal monthlyRate = rate.divide(new BigDecimal(100)).divide(new BigDecimal(12), MathContext.DECIMAL128);
+        BigDecimal monthlyRate = rate.divide(new BigDecimal(100), 4, RoundingMode.HALF_UP)
+                .divide(new BigDecimal(12), 4, RoundingMode.HALF_UP);
         int term = loanStatementRequestDto.getTerm();
 
         BigDecimal numerator = monthlyRate.multiply(totalAmount)
                 .multiply((monthlyRate.add(BigDecimal.ONE)).pow(term));
         BigDecimal denominator = (monthlyRate.add(BigDecimal.ONE))
                 .pow(term).subtract(BigDecimal.ONE);
-        BigDecimal monthlyPayment = numerator.divide(denominator, MathContext.DECIMAL128);
-        BigDecimal totalPaymentAmount = monthlyPayment.multiply(new BigDecimal(term));
+        BigDecimal monthlyPayment = numerator.divide(denominator, 4, RoundingMode.HALF_UP);
+        BigDecimal totalPaymentAmount = monthlyPayment.multiply(new BigDecimal(term)).setScale(4, RoundingMode.HALF_UP);
 
         LoanOfferDto loanOfferDto = LoanOfferDto.builder()
                 .statementId(UUID.randomUUID())
@@ -111,8 +114,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     public CreditDto calc(ScoringDataDto scoringDataDto) {
         logger.info("Received scoring data: {}", scoringDataDto);
 
-        BigDecimal baseRate = new BigDecimal(loanRate);
-        BigDecimal rate = baseRate;
+        BigDecimal rate = new BigDecimal(loanRate);
         BigDecimal amount = scoringDataDto.getAmount();
         int term = scoringDataDto.getTerm();
         BigDecimal monthlySalary = scoringDataDto.getEmployment().getSalary();
@@ -133,10 +135,10 @@ public class CalculatorServiceImpl implements CalculatorService {
                 logger.warn("Applicant is unemployed");
                 return null;
             case SELF_EMPLOYED:
-                rate = rate.add(new BigDecimal("1.0"));
+                rate = rate.add(new BigDecimal("1.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
             case BUSINESS_OWNER:
-                rate = rate.add(new BigDecimal("2.0"));
+                rate = rate.add(new BigDecimal("2.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
             default:
                 break;
@@ -144,10 +146,10 @@ public class CalculatorServiceImpl implements CalculatorService {
 
         switch (scoringDataDto.getEmployment().getPosition()) {
             case MIDDLE_MANAGER:
-                rate = rate.subtract(new BigDecimal("2.0"));
+                rate = rate.subtract(new BigDecimal("2.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
             case TOP_MANAGER:
-                rate = rate.subtract(new BigDecimal("3.0"));
+                rate = rate.subtract(new BigDecimal("3.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
             default:
                 break;
@@ -155,10 +157,10 @@ public class CalculatorServiceImpl implements CalculatorService {
 
         switch (scoringDataDto.getMaritalStatus()) {
             case MARRIED:
-                rate = rate.subtract(new BigDecimal("3.0"));
+                rate = rate.subtract(new BigDecimal("3.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
             case DIVORCED:
-                rate = rate.add(new BigDecimal("1.0"));
+                rate = rate.add(new BigDecimal("1.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
             default:
                 break;
@@ -167,16 +169,16 @@ public class CalculatorServiceImpl implements CalculatorService {
         switch (scoringDataDto.getGender()) {
             case FEMALE:
                 if (age >= 32 && age <= 60) {
-                    rate = rate.subtract(new BigDecimal("3.0"));
+                    rate = rate.subtract(new BigDecimal("3.0")).setScale(4, RoundingMode.HALF_UP);
                 }
                 break;
             case MALE:
                 if (age >= 30 && age <= 55) {
-                    rate = rate.subtract(new BigDecimal("3.0"));
+                    rate = rate.subtract(new BigDecimal("3.0")).setScale(4, RoundingMode.HALF_UP);
                 }
                 break;
             case NON_BINARY:
-                rate = rate.add(new BigDecimal("7.0"));
+                rate = rate.add(new BigDecimal("7.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
             default:
                 break;
@@ -191,25 +193,26 @@ public class CalculatorServiceImpl implements CalculatorService {
         }
 
         if (scoringDataDto.getIsSalaryClient()) {
-            rate = rate.subtract(new BigDecimal("1.0"));
+            rate = rate.subtract(new BigDecimal("1.0")).setScale(4, RoundingMode.HALF_UP);
         }
         if (scoringDataDto.getIsInsuranceEnabled()) {
-            rate = rate.subtract(new BigDecimal("0.5"));
+            rate = rate.subtract(new BigDecimal("0.5")).setScale(4, RoundingMode.HALF_UP);
         }
 
-        BigDecimal monthlyRate = rate.divide(new BigDecimal("100"), MathContext.DECIMAL64).divide(new BigDecimal("12"), MathContext.DECIMAL64);
+        BigDecimal monthlyRate = rate.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP)
+                .divide(new BigDecimal("12"), 4, RoundingMode.HALF_UP);
         BigDecimal annuityCoefficient = monthlyRate.add(BigDecimal.ONE).pow(term).multiply(monthlyRate)
-                .divide((monthlyRate.add(BigDecimal.ONE).pow(term)).subtract(BigDecimal.ONE), MathContext.DECIMAL64);
-        BigDecimal monthlyPayment = amount.multiply(annuityCoefficient);
+                .divide((monthlyRate.add(BigDecimal.ONE).pow(term)).subtract(BigDecimal.ONE), 4, RoundingMode.HALF_UP);
+        BigDecimal monthlyPayment = amount.multiply(annuityCoefficient).setScale(4, RoundingMode.HALF_UP);
 
-        BigDecimal psk = rate.multiply(new BigDecimal(term)).divide(new BigDecimal("12"), MathContext.DECIMAL64);
+        BigDecimal psk = rate.multiply(new BigDecimal(term)).divide(new BigDecimal("12"), 4, RoundingMode.HALF_UP);
 
         List<PaymentScheduleElementDto> paymentSchedule = new ArrayList<>();
         BigDecimal remainingDebt = amount;
         for (int i = 1; i <= term; i++) {
-            BigDecimal interestPayment = remainingDebt.multiply(monthlyRate);
-            BigDecimal debtPayment = monthlyPayment.subtract(interestPayment);
-            remainingDebt = remainingDebt.subtract(debtPayment);
+            BigDecimal interestPayment = remainingDebt.multiply(monthlyRate).setScale(4, RoundingMode.HALF_UP);
+            BigDecimal debtPayment = monthlyPayment.subtract(interestPayment).setScale(4, RoundingMode.HALF_UP);
+            remainingDebt = remainingDebt.subtract(debtPayment).setScale(4, RoundingMode.HALF_UP);
 
             PaymentScheduleElementDto paymentElement = new PaymentScheduleElementDto();
             paymentElement.setNumber(i);
@@ -222,7 +225,7 @@ public class CalculatorServiceImpl implements CalculatorService {
         }
 
         CreditDto creditDto = new CreditDto();
-        creditDto.setAmount(amount);
+        creditDto.setAmount(amount.setScale(4, RoundingMode.HALF_UP));
         creditDto.setTerm(term);
         creditDto.setMonthlyPayment(monthlyPayment);
         creditDto.setRate(rate);

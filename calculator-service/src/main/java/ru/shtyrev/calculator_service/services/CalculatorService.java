@@ -1,9 +1,6 @@
 package ru.shtyrev.calculator_service.services;
 
-import ru.shtyrev.calculator_service.dtos.CreditDto;
-import ru.shtyrev.calculator_service.dtos.LoanOfferDto;
-import ru.shtyrev.calculator_service.dtos.LoanStatementRequestDto;
-import ru.shtyrev.calculator_service.dtos.ScoringDataDto;
+import ru.shtyrev.dtos.dtos.*;
 
 import java.util.List;
 

@@ -8,11 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.shtyrev.calculator_service.dtos.CreditDto;
-import ru.shtyrev.calculator_service.dtos.LoanOfferDto;
-import ru.shtyrev.calculator_service.dtos.LoanStatementRequestDto;
-import ru.shtyrev.calculator_service.dtos.ScoringDataDto;
+
 import ru.shtyrev.calculator_service.services.CalculatorService;
+import ru.shtyrev.dtos.dtos.*;
 
 import java.util.List;
 

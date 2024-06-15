@@ -1,11 +1,10 @@
-package ru.shtyrev.calculator_service.dtos;
+package ru.shtyrev.dtos.dtos;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.validation.annotation.Validated;
-import ru.shtyrev.calculator_service.annotation.Adult;
+import ru.shtyrev.dtos.annotation.Adult;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
