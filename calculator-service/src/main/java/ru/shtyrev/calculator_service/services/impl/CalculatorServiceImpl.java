@@ -96,7 +96,6 @@ public class CalculatorServiceImpl implements CalculatorService {
         BigDecimal totalPaymentAmount = monthlyPayment.multiply(new BigDecimal(term)).setScale(4, RoundingMode.HALF_UP);
 
         LoanOfferDto loanOfferDto = LoanOfferDto.builder()
-                .statementId(UUID.randomUUID())
                 .requestAmount(requestAmount)
                 .totalAmount(totalPaymentAmount)
                 .term(term)
