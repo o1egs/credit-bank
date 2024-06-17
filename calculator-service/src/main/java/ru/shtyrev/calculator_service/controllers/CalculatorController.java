@@ -10,9 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ru.shtyrev.calculator_service.services.CalculatorService;
-import ru.shtyrev.dtos.dtos.*;
+import ru.shtyrev.dtos.dtos.CreditDto;
+import ru.shtyrev.dtos.dtos.LoanOfferDto;
+import ru.shtyrev.dtos.dtos.LoanStatementRequestDto;
+import ru.shtyrev.dtos.dtos.ScoringDataDto;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/calculator")
