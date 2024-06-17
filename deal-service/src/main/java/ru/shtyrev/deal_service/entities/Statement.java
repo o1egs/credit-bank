@@ -13,6 +13,7 @@ import ru.shtyrev.dtos.enums.ApplicationStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -49,5 +50,5 @@ public class Statement {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    StatusHistory statusHistory;
+    List<StatusHistory> statusHistory;
 }

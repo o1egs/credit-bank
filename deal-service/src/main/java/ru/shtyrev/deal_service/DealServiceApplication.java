@@ -54,9 +54,9 @@ public class DealServiceApplication implements CommandLineRunner {
 //				.build();
 //		Client saved = clientRepository.save(client);
 //		System.out.println(saved);
-		Client client = clientRepository.findById(UUID.fromString("c9a465b9-f0e7-4972-adf3-b8b819484d03")).orElseThrow();
-		System.out.println(client);
-		System.out.println(client.getPassport());
-		System.out.println(client.getEmployment());
+//		Client client = clientRepository.findById(UUID.fromString("c9a465b9-f0e7-4972-adf3-b8b819484d03")).orElseThrow();
+//		System.out.println(client);
+//		System.out.println(client.getPassport());
+//		System.out.println(client.getEmployment());
 	}
 }
