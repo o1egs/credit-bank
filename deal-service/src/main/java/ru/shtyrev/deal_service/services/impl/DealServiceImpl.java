@@ -3,13 +3,13 @@ package ru.shtyrev.deal_service.services.impl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import ru.shtyrev.deal_service.entities.Client;
 import ru.shtyrev.deal_service.entities.Statement;
@@ -24,11 +24,10 @@ import ru.shtyrev.dtos.dtos.*;
 import ru.shtyrev.dtos.enums.ApplicationStatus;
 import ru.shtyrev.dtos.enums.ChangeType;
 
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,6 @@ public class DealServiceImpl implements DealService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public List<LoanOfferDto> createStatement(LoanStatementRequestDto loanStatementRequestDto) {
-        System.out.println(loanStatementRequestDto);
         logger.info("Creating passport for {} {}", loanStatementRequestDto.getFirstName(), loanStatementRequestDto.getLastName());
         Passport passport = Passport.builder()
                 .number(loanStatementRequestDto.getPassportNumber())
@@ -102,9 +100,12 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public void selectOffer(LoanOfferDto loanOfferDto) {
+        logger.info("Try to find statement by id");
         Statement statement = statementRepository.findById(loanOfferDto.getStatementId())
                 .orElseThrow();
+        logger.info("Statement with id {} found", statement.getId());
 
+        logger.info("Setting status {} to statement with id {}", ApplicationStatus.APPROVED, statement.getId());
         statement.setStatus(ApplicationStatus.APPROVED);
         List<StatusHistory> statusHistory = statement.getStatusHistory();
         StatusHistory historyElement = StatusHistory.builder()
@@ -112,24 +113,29 @@ public class DealServiceImpl implements DealService {
                 .time(LocalDate.now())
                 .changeType(ChangeType.AUTOMATIC)
                 .build();
+        logger.info("Adding history element to statement with id {}", statement.getId());
         statusHistory.add(historyElement);
         statement.setStatusHistory(statusHistory);
 
+        logger.info("Setting applied offer to statement with id {}", statement.getId());
         statement.setAppliedOffer(loanOfferDto);
 
+        logger.info("Saving statement with id {}", statement.getId());
         statementRepository.save(statement);
-
     }
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public CreditDto calculate(String statementId,FinishRegistrationRequestDto finishRegistrationRequestDto) {
+    public CreditDto calculate(String statementId, FinishRegistrationRequestDto finishRegistrationRequestDto) {
+        logger.info("Try to find statement by id");
         Statement statement = statementRepository.findById(UUID.fromString(statementId))
                 .orElseThrow();
+        logger.info("Statement with id {} found", statement.getId());
 
         Client statementClient = statement.getClient();
         Passport statementClientPassport = statementClient.getPassport();
 
+        logger.info("Creating scoringDataDto");
         ScoringDataDto scoringDataDto = ScoringDataDto.builder()
                 .amount(statement.getAppliedOffer().getRequestAmount())
                 .term(statement.getAppliedOffer().getTerm())
@@ -170,6 +176,7 @@ public class DealServiceImpl implements DealService {
 
         statementClient.setEmployment(employment);
 
+        logger.info("Saving client with id: {}", statementClient.getId());
         clientRepository.save(statementClient);
 
         statement.setStatus(ApplicationStatus.CC_APPROVED);
@@ -185,6 +192,7 @@ public class DealServiceImpl implements DealService {
 
         statement.setStatusHistory(statusHistory);
 
+        logger.info("Saving statement with id {}", statement.getId());
         statementRepository.save(statement);
 
         ResponseEntity<CreditDto> response = restTemplate.postForEntity(
