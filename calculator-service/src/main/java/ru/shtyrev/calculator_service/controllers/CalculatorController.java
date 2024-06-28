@@ -15,6 +15,7 @@ import ru.shtyrev.dtos.dtos.LoanOfferDto;
 import ru.shtyrev.dtos.dtos.LoanStatementRequestDto;
 import ru.shtyrev.dtos.dtos.ScoringDataDto;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -26,7 +27,7 @@ public class CalculatorController {
     CalculatorService calculatorService;
 
     @PostMapping("/offers")
-    public ResponseEntity<List<LoanOfferDto>> offers(@RequestBody LoanStatementRequestDto loanStatementRequestDto) {
+    public ResponseEntity<List<LoanOfferDto>> offers(@RequestBody @Valid LoanStatementRequestDto loanStatementRequestDto) {
         List<LoanOfferDto> offers = calculatorService.offers(loanStatementRequestDto);
         return ResponseEntity.ok(offers);
     }

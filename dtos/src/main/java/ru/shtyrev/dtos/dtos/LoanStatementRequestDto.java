@@ -1,11 +1,12 @@
 package ru.shtyrev.dtos.dtos;
 
-import jakarta.validation.constraints.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.shtyrev.dtos.annotation.Adult;
 
 
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

@@ -1,8 +1,8 @@
 package ru.shtyrev.calculator_service.services.impl;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Valid;
-import jakarta.validation.Validator;
+//import jakarta.validation.ConstraintViolation;
+//import jakarta.validation.Valid;
+//import jakarta.validation.Validator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import ru.shtyrev.calculator_service.services.CalculatorService;
 import ru.shtyrev.dtos.dtos.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -35,19 +36,19 @@ public class CalculatorServiceImpl implements CalculatorService {
 
     @Setter
     Integer loanRate;
-    final Validator validator;
+//    final Validator validator;
 
     @Override
     public List<LoanOfferDto> offers(@Valid LoanStatementRequestDto loanStatementRequestDto) {
         logger.info("Received loan statement request: {}", loanStatementRequestDto);
 
-        var constraintViolations = validator.validate(loanStatementRequestDto);
-        if (!constraintViolations.isEmpty()) {
-            for (ConstraintViolation<LoanStatementRequestDto> violation : constraintViolations) {
-                logger.error("Validation error: {}", violation.getMessage());
-            }
-            throw new RuntimeException("Validation failed");
-        }
+//        var constraintViolations = validator.validate(loanStatementRequestDto);
+//        if (!constraintViolations.isEmpty()) {
+//            for (ConstraintViolation<LoanStatementRequestDto> violation : constraintViolations) {
+//                logger.error("Validation error: {}", violation.getMessage());
+//            }
+//            throw new RuntimeException("Validation failed");
+//        }
 
         LoanOfferDto loanOfferDto1 = loanOfferDto(loanStatementRequestDto, true, true);
         LoanOfferDto loanOfferDto2 = loanOfferDto(loanStatementRequestDto, true, false);
