@@ -41,6 +41,6 @@ public class Credit {
     List<PaymentScheduleElementDto> paymentSchedule;
     Boolean insuranceEnabled;
     Boolean salaryClient;
-
+    @Enumerated(EnumType.STRING)
     CreditStatus creditStatus;
 }
