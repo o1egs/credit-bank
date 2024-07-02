@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.shtyrev.deal_service.entities.Client;
+import ru.shtyrev.deal_service.entities.Credit;
 import ru.shtyrev.deal_service.entities.Statement;
 import ru.shtyrev.deal_service.jsonbs.Employment;
 import ru.shtyrev.deal_service.jsonbs.Passport;
@@ -23,6 +24,7 @@ import ru.shtyrev.deal_service.services.DealService;
 import ru.shtyrev.dtos.dtos.*;
 import ru.shtyrev.dtos.enums.ApplicationStatus;
 import ru.shtyrev.dtos.enums.ChangeType;
+import ru.shtyrev.dtos.enums.CreditStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -199,9 +201,24 @@ public class DealServiceImpl implements DealService {
                 "http://localhost:8080/calculator/calc",
                 scoringDataDto,
                 CreditDto.class);
+        CreditDto creditDto = response.getBody();
 
-        assert response.getBody() != null;
+        assert creditDto != null;
 
-        return response.getBody();
+        Credit credit = Credit.builder()
+                .amount(creditDto.getAmount())
+                .term(creditDto.getTerm())
+                .monthlyPayment(creditDto.getMonthlyPayment())
+                .rate(creditDto.getRate())
+                .psk(creditDto.getPsk())
+                .paymentSchedule(creditDto.getPaymentSchedule())
+                .insuranceEnabled(creditDto.getIsInsuranceEnabled())
+                .salaryClient(creditDto.getIsSalaryClient())
+                .creditStatus(CreditStatus.CALCULATED)
+                .build();
+
+        Credit save = creditRepository.save(credit);
+
+        return creditDto;
     }
 }
