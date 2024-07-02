@@ -122,18 +122,18 @@ public class CalculatorServiceImpl implements CalculatorService {
         int age = Period.between(scoringDataDto.getBirthdate(), LocalDate.now()).getYears();
         if (age < 20 || age > 65) {
             logger.warn("Applicant's age {} is out of acceptable range", age);
-            return null;
+            throw new RuntimeException("Applicant's age is out of acceptable range");
         }
 
         if (amount.compareTo(monthlySalary.multiply(new BigDecimal(25))) > 0) {
             logger.warn("Requested amount {} exceeds acceptable limit based on salary {}", amount, monthlySalary);
-            return null;
+            throw new RuntimeException("Requested amount exceeds acceptable limit based on salary");
         }
 
         switch (scoringDataDto.getEmployment().getEmploymentStatus()) {
             case UNEMPLOYED:
                 logger.warn("Applicant is unemployed");
-                return null;
+                throw new RuntimeException("Applicant is unemployed");
             case SELF_EMPLOYED:
                 rate = rate.add(new BigDecimal("1.0")).setScale(4, RoundingMode.HALF_UP);
                 break;
@@ -189,7 +189,7 @@ public class CalculatorServiceImpl implements CalculatorService {
 
         if (totalMonthsWorked < 18 || currentMonthsWorked < 3) {
             logger.warn("Insufficient work experience: total {}, current {}", totalMonthsWorked, currentMonthsWorked);
-            return null;
+            throw new RuntimeException("Insufficient work experience");
         }
 
         if (scoringDataDto.getIsSalaryClient()) {

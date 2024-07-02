@@ -28,7 +28,10 @@ import ru.shtyrev.dtos.enums.CreditStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import static java.util.Objects.*;
 
 
 @Service
@@ -170,6 +173,7 @@ public class DealServiceImpl implements DealService {
         EmploymentDto employmentDto = finishRegistrationRequestDto.getEmployment();
         Employment employment = Employment.builder()
                 .salary(employmentDto.getSalary())
+                .status(employmentDto.getEmploymentStatus())
                 .workExperienceCurrent(employmentDto.getWorkExperienceCurrent())
                 .workExperienceTotal(employmentDto.getWorkExperienceTotal())
                 .position(employmentDto.getPosition())
@@ -194,16 +198,17 @@ public class DealServiceImpl implements DealService {
 
         statement.setStatusHistory(statusHistory);
 
-        logger.info("Saving statement with id {}", statement.getId());
-        statementRepository.save(statement);
-
         ResponseEntity<CreditDto> response = restTemplate.postForEntity(
                 "http://localhost:8080/calculator/calc",
                 scoringDataDto,
                 CreditDto.class);
         CreditDto creditDto = response.getBody();
 
-        assert creditDto != null;
+        if (isNull(creditDto)) {
+
+        }
+
+        logger.info(response.getBody().toString());
 
         Credit credit = Credit.builder()
                 .amount(creditDto.getAmount())
@@ -218,6 +223,11 @@ public class DealServiceImpl implements DealService {
                 .build();
 
         Credit save = creditRepository.save(credit);
+
+        statement.setCredit(credit);
+
+        logger.info("Saving statement with id {}", statement.getId());
+        statementRepository.save(statement);
 
         return creditDto;
     }
