@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.shtyrev.deal_service.entities.Client;
+import ru.shtyrev.deal_service.entities.Credit;
 import ru.shtyrev.deal_service.entities.Statement;
 import ru.shtyrev.deal_service.jsonbs.Employment;
 import ru.shtyrev.deal_service.jsonbs.Passport;
@@ -23,10 +24,14 @@ import ru.shtyrev.deal_service.services.DealService;
 import ru.shtyrev.dtos.dtos.*;
 import ru.shtyrev.dtos.enums.ApplicationStatus;
 import ru.shtyrev.dtos.enums.ChangeType;
+import ru.shtyrev.dtos.enums.CreditStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import static java.util.Objects.*;
 
 
 @Service
@@ -168,6 +173,7 @@ public class DealServiceImpl implements DealService {
         EmploymentDto employmentDto = finishRegistrationRequestDto.getEmployment();
         Employment employment = Employment.builder()
                 .salary(employmentDto.getSalary())
+                .status(employmentDto.getEmploymentStatus())
                 .workExperienceCurrent(employmentDto.getWorkExperienceCurrent())
                 .workExperienceTotal(employmentDto.getWorkExperienceTotal())
                 .position(employmentDto.getPosition())
@@ -192,16 +198,37 @@ public class DealServiceImpl implements DealService {
 
         statement.setStatusHistory(statusHistory);
 
-        logger.info("Saving statement with id {}", statement.getId());
-        statementRepository.save(statement);
-
         ResponseEntity<CreditDto> response = restTemplate.postForEntity(
                 "http://localhost:8080/calculator/calc",
                 scoringDataDto,
                 CreditDto.class);
+        CreditDto creditDto = response.getBody();
 
-        assert response.getBody() != null;
+        if (isNull(creditDto)) {
 
-        return response.getBody();
+        }
+
+        logger.info(response.getBody().toString());
+
+        Credit credit = Credit.builder()
+                .amount(creditDto.getAmount())
+                .term(creditDto.getTerm())
+                .monthlyPayment(creditDto.getMonthlyPayment())
+                .rate(creditDto.getRate())
+                .psk(creditDto.getPsk())
+                .paymentSchedule(creditDto.getPaymentSchedule())
+                .insuranceEnabled(creditDto.getIsInsuranceEnabled())
+                .salaryClient(creditDto.getIsSalaryClient())
+                .creditStatus(CreditStatus.CALCULATED)
+                .build();
+
+        Credit save = creditRepository.save(credit);
+
+        statement.setCredit(credit);
+
+        logger.info("Saving statement with id {}", statement.getId());
+        statementRepository.save(statement);
+
+        return creditDto;
     }
 }

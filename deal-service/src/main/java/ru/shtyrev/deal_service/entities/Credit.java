@@ -12,6 +12,7 @@ import ru.shtyrev.dtos.enums.CreditStatus;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -37,9 +38,9 @@ public class Credit {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    PaymentScheduleElementDto paymentSchedule;
+    List<PaymentScheduleElementDto> paymentSchedule;
     Boolean insuranceEnabled;
     Boolean salaryClient;
-
+    @Enumerated(EnumType.STRING)
     CreditStatus creditStatus;
 }

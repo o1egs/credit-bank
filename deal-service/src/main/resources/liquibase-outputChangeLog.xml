@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <changeSet author="Олег (generated)" id="1718912418758-1">
+    <changeSet author="Олег (generated)" id="1719912352952-1">
         <createTable tableName="clients">
             <column name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="clients_pkey"/>
@@ -17,13 +17,13 @@
             <column name="passport" type="JSONB"/>
         </createTable>
     </changeSet>
-    <changeSet author="Олег (generated)" id="1718912418758-2">
+    <changeSet author="Олег (generated)" id="1719912352952-2">
         <createTable tableName="credits">
             <column name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="credits_pkey"/>
             </column>
             <column name="amount" type="numeric(19, 2)"/>
-            <column name="credit_status" type="INTEGER"/>
+            <column name="credit_status" type="VARCHAR(255)"/>
             <column name="insurance_enabled" type="BOOLEAN"/>
             <column name="monthly_payment" type="numeric(19, 2)"/>
             <column name="payment_schedule" type="JSONB"/>
@@ -33,7 +33,7 @@
             <column name="term" type="INTEGER"/>
         </createTable>
     </changeSet>
-    <changeSet author="Олег (generated)" id="1718912418758-3">
+    <changeSet author="Олег (generated)" id="1719912352952-3">
         <createTable tableName="statements">
             <column name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="statements_pkey"/>
@@ -48,10 +48,10 @@
             <column name="credit_id" type="UUID"/>
         </createTable>
     </changeSet>
-    <changeSet author="Олег (generated)" id="1718912418758-4">
+    <changeSet author="Олег (generated)" id="1719912352952-4">
         <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="statements" constraintName="fk2itb1v5vfjpb9hkm8wgc0j6ba" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="clients" validate="true"/>
     </changeSet>
-    <changeSet author="Олег (generated)" id="1718912418758-5">
+    <changeSet author="Олег (generated)" id="1719912352952-5">
         <addForeignKeyConstraint baseColumnNames="credit_id" baseTableName="statements" constraintName="fkafsxthq6geukhflqd1l4yjphe" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="credits" validate="true"/>
     </changeSet>
 </databaseChangeLog>
